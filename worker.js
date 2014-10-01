@@ -1,64 +1,35 @@
-var http	         = require('http'),
-	Scheduler        = require('./lib/scheduler.js'),
-    HttpLoader       = require('./lib/httpLoader.js'),
-    ParsePreviewData = require('./lib/parsePreviewData.js'),
-    ParseIframe 	 = require('./lib/parseIframe.js'),
-    Mailer		     = require('./lib/mailer.js');
+var Scheduler     = require('./lib/scheduler.js'),
+    HttpLoader    = require('./lib/httpLoader.js'),
+    PreviewParser = require('./lib/parsePreviewData.js'),
+    FrameParser   = require('./lib/parseIframe.js'),
+    Mailer		  = require('./lib/mailer.js');
 
 process.on('uncaughtException', function (err) {
-    console.log(err);
+    fail(err);
 }); 
 
-var mailer = new Mailer();
-
 var mailRecipients = process.env.MAIL_RECIPIENTS || "ryan.brewer@gettyimages.com";
+var previewUrl = process.env.PREVIEW_URL || "http://embed.gettyimages.com/preview/1765189";
+var previewTimer = process.env.PREVIEW_TIMER || 60000;
 
 var fail = function(message) {
 	console.log(message);
-	mailer.sendMail("Embed Preview Failure", "Embed Preview failed: \r\n\r\nReason:\r\n\r\n" + failureReason, mailRecipients);
+	Mailer.sendMail("Embed Preview Failure", "Embed Preview failed: \r\n\r\nReason:\r\n\r\n" + message, mailRecipients);
 }
 
-var previewUrl = process.env.PREVIEW_URL || "http://embed.gettyimages.com/preview/1765189";
-
-var previewLoader = new HttpLoader(previewUrl,
-	function(responseText) {
-		var previewParser = new ParsePreviewData(responseText,
-			function(frameSrc) {
-				console.log("parsed preview: " + frameSrc);
-				var frameLoader = new HttpLoader(frameSrc,
-					function(responseText) {
-						console.log('loaded iframe');
-						var frameParser = new ParseIframe(responseText,
-							function(imageSource) {
-								console.log("parsed iframe: " + imageSource);
-								var imageLoader = new HttpLoader(imageSource,
-									function(responseText) {
-										console.log("retrieved image!")
-									},
-									function(failureReason) {
-										fail("could not load image: " + failureReason);
-									});
-								imageLoader.execute();
-							},
-							function(failureReason) {
-								fail("failed to parse iframe: " + failureReason);
-							});
-						frameParser.execute();
-					},
-					function(failureReason) {
-						fail("could not load iFrame source: " + failureReason);
-					});
-				frameLoader.execute();
-			},
-			function(failureReason) {
-				fail(failureReason);
-			});
-		previewParser.execute();
-	},
-	function(failureReason) {
-		fail("failed: " + failureReason)
-	});
-
 var scheduler = new Scheduler();
-scheduler.addTask(function() { previewLoader.execute() }, process.env.PREVIEW_TIMER);
+
+scheduler.addTask(function() {
+	console.log("Executing preview loader task.")
+	HttpLoader.execute(previewUrl)
+		.then(PreviewParser.execute, fail)
+		.then(HttpLoader.execute, fail)
+		.then(FrameParser.execute, fail)
+		.then(previewLoaderSuccess, fail);
+	}, previewTimer);
+
 scheduler.start();
+
+function previewLoaderSuccess(data) {
+	console.log("Successfully created embed via '" + previewUrl + "', viewed the iframe, and loaded the image.")
+}

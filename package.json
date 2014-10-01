@@ -9,7 +9,8 @@
   "dependencies": {
     "underscore": "1.4.x",
     "nodemailer": "1.3.x",
-    "cheerio": "x"
+    "cheerio": "x",
+    "q": "x"
   },
   "engines": {
     "node": "0.10.x"
