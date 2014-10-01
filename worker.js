@@ -5,7 +5,11 @@ var http	         = require('http'),
     ParseIframe 	 = require('./lib/parseIframe.js'),
     Mailer		     = require('./lib/mailer.js');
 
-var mailer		     = new Mailer();
+process.on('uncaughtException', function (err) {
+    console.log(err);
+}); 
+
+var mailer = new Mailer();
 
 var mailRecipients = process.env.MAIL_RECIPIENTS || "ryan.brewer@gettyimages.com";
 
@@ -56,5 +60,5 @@ var previewLoader = new HttpLoader(previewUrl,
 	});
 
 var scheduler = new Scheduler();
-scheduler.addTask(function() { previewLoader.execute() }, 60000);
+scheduler.addTask(function() { previewLoader.execute() }, process.env.PREVIEW_TIMER);
 scheduler.start();
