@@ -2,12 +2,14 @@
   "name": "node-js-getting-started",
   "version": "0.1.2",
   "description": "A sample Node.js app using Express 4",
-  "main": "index.js",
+  "main": "worker.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node worker.js"
   },
   "dependencies": {
-    "express": "~4.9.x"
+    "underscore": "1.4.x",
+    "nodemailer": "1.3.x",
+    "cheerio": "x"
   },
   "engines": {
     "node": "0.10.x"
