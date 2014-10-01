@@ -1,1 +1,1 @@
-worker: node --debug worker.js
+worker: node worker.js
