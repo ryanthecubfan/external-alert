@@ -18,7 +18,7 @@ var previewTimer = process.env.PREVIEW_TIMER || 60000;
 
 var scheduler = new Scheduler();
 
-scheduler.addTask(function previewLoaderExecute(previewUrl) {
+scheduler.addTask(function() {
 	console.log("Executing preview loader task.")
 	var p = HttpLoader.execute(previewUrl)
 	    .then(PreviewParser.execute)
