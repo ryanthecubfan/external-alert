@@ -1,9 +1,12 @@
-var Scheduler     = require('./lib/scheduler.js'),
-    HttpLoader    = require('./lib/httpLoader.js'),
-    PreviewParser = require('./lib/parsePreviewData.js'),
-    FrameParser   = require('./lib/parseIframe.js'),
-    Mailer		  = require('./lib/mailer.js'),
+var EmbedWF       = require('./lib/workflows/embed.js'),
+    EmbedCdnWF    = require('./lib/workflows/cdn.js'),
+    EmbedSearchWF = require('./lib/workflows/search.js'),
+    EmbedMltWF    = require('./lib/workflows/mlt.js'),
+    Mailer        = require('./lib/mailer.js'),
+    Scheduler     = require('./lib/scheduler.js'),
     Q			  = require('q');
+
+var mailRecipients = process.env.MAIL_RECIPIENTS || "ryan.brewer@gettyimages.com";
 
 process.on('uncaughtException', function (err) {
 	console.log("****************Uncaught Exception****************");
@@ -11,28 +14,11 @@ process.on('uncaughtException', function (err) {
 	Mailer.sendMail("Embed Preview Failure", "Uncaught Exception: \r\n\r\nReason:\r\n\r\n" + err, mailRecipients);
 }); 
 
-var mailRecipients = process.env.MAIL_RECIPIENTS || "ryan.brewer@gettyimages.com";
-var previewUrl = process.env.PREVIEW_URL || "http://embed.gettyimages.com/preview/1765189";
-var previewTimer = process.env.PREVIEW_TIMER || 60000;
-
-
 var scheduler = new Scheduler();
 
-scheduler.addTask(function() {
-	console.log("Executing preview loader task.")
-	var p = HttpLoader.execute(previewUrl)
-	    .then(PreviewParser.execute)
-		.then(HttpLoader.execute)
-		.then(FrameParser.execute)
-		.then(HttpLoader.execute)
-		.then(function(data) {
-			console.log("Successfully created embed via '" + previewUrl + "', viewed the iframe, and loaded the image.")
-		})
-		.catch(function(message) {
-			console.log("****************Loader Exception****************");
-			console.log(message);
-			Mailer.sendMail("Embed Preview Failure", "Embed Preview failed: \r\n\r\nReason:\r\n\r\n" + message, mailRecipients);
-		});
-}, previewTimer);
+scheduler.addTask(EmbedWF.createWorkflow());
+scheduler.addTask(EmbedCdnWF.createWorkflow());
+scheduler.addTask(EmbedSearchWF.createWorkflow());
+scheduler.addTask(EmbedMltWF.createWorkflow());
 
 scheduler.start();
