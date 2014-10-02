@@ -8,7 +8,7 @@ var Scheduler     = require('./lib/scheduler.js'),
 process.on('uncaughtException', function (err) {
 	console.log("****************Uncaught Exception****************");
 	console.log(err);
-	Mailer.sendMail("Embed Preview Failure", "Uncaught Exception: \r\n\r\nReason:\r\n\r\n" + message, mailRecipients);
+	Mailer.sendMail("Embed Preview Failure", "Uncaught Exception: \r\n\r\nReason:\r\n\r\n" + err, mailRecipients);
 }); 
 
 var mailRecipients = process.env.MAIL_RECIPIENTS || "ryan.brewer@gettyimages.com";
