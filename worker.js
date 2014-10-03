@@ -2,7 +2,7 @@ var EmbedWF       = require('./lib/workflows/embed.js'),
     EmbedCdnWF    = require('./lib/workflows/cdn.js'),
     EmbedSearchWF = require('./lib/workflows/search.js'),
     EmbedMltWF    = require('./lib/workflows/mlt.js'),
-    Mailer        = require('./lib/mailer.js'),
+    AlertManager  = require('./lib/alertManager.js'),
     Scheduler     = require('./lib/scheduler.js'),
     Q			  = require('q');
 
