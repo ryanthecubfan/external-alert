@@ -10,7 +10,8 @@
     "underscore": "1.4.x",
     "nodemailer": "1.3.x",
     "cheerio": "x",
-    "q": "x"
+    "q": "x",
+    "request": "x"
   },
   "engines": {
     "node": "0.10.x"
