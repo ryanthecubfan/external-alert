@@ -5,9 +5,10 @@ var config		  = require('./lib/config/config.js'),
     embedMltWF    = require('./lib/workflows/mlt.js'),
     alertManager  = require('./lib/alertManager.js'),
     Scheduler     = require('./lib/scheduler.js'),
-    log  		  = require('./lib/log.js');
+    log  		  = require('./lib/log.js'),
+    AWS           = require('aws-sdk');
 
-var mailRecipients = "ryan.brewer@gettyimages.com";
+var mailRecipients = "james.speaker@gettyimages.com";
 var component      = "WORKER";
 
 process.on('uncaughtException', function (err) {
@@ -16,6 +17,8 @@ process.on('uncaughtException', function (err) {
 	alertManager.sendMail(config.mailer.defaultSubject, "Uncaught Exception: \r\n\r\nReason:\r\n\r\n" + err, mailRecipients);
 }); 
 
+console.log("WORKER", "Setting AWS region to us-west-2");
+AWS.config.update({region: 'us-west-2'});
 
 var scheduler = new Scheduler();
 
