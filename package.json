@@ -1,10 +1,10 @@
 {
-  "name": "node-js-getting-started",
+  "name": "external-alert",
   "version": "0.1.2",
-  "description": "A sample Node.js app using Express 4",
-  "main": "worker.js",
+  "description": "Executes customizable workflows and notifies via SQS and/or email",
+  "main": "example-worker.js",
   "scripts": {
-    "start": "node worker.js"
+    "start": "node example-worker.js"
   },
   "dependencies": {
     "underscore": "1.4.x",
@@ -16,14 +16,11 @@
   "engines": {
     "node": "0.10.x"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/heroku/node-js-getting-started"
-  },
   "keywords": [
     "node",
-    "heroku",
-    "express"
+    "aws-sqs",
+    "aws-sdk",
+    "alert"
   ],
   "license": "MIT"
 }
